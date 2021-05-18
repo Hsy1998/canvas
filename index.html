@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      let canvas = document.getElementById("canvas");
+      canvas.width = document.documentElement.clientWidth;
+      canvas.height = document.documentElement.clientHeight;
+      let ctx = canvas.getContext("2d");
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 8;
+      ctx.lineCap = "round"; // 线与线之间圆点连接
+      let lock = false; // 给canvas画板上一个锁，鼠标按下时锁开启，移开后锁关闭
+      let last;
+      let isTouchDevice = "ontouchstart" in document.documentElement; // 判断是否是手机
+      if (isTouchDevice) {
+        canvas.ontouchstart = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          last = [x, y];
+          console.log(last);
+        };
+        canvas.ontouchmove = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          drawLine(last[0], last[1], x, y);
+          last = [x, y]; // 将结束坐标传给起始坐标，形成新的起始坐标
+        };
+      } else {
+        canvas.onmousedown = (e) => {
+          lock = true; // 鼠标点击屏幕时将锁开启
+          last = [e.clientX, e.clientY]; // 记录鼠标第一次点击的坐标，作为画线的开始坐标
+        };
+        canvas.onmousemove = (e) => {
+          if (lock === true) {
+            drawLine(last[0], last[1], e.clientX, e.clientY);
+            last = [e.clientX, e.clientY]; // 将结束坐标传给起始坐标，形成新的起始坐标
+          }
+        };
+        canvas.onmouseup = () => {
+          lock = false;
+        };
+      }
+      function drawLine(x1, x2, x3, x4) {
+        ctx.beginPath();
+        ctx.moveTo(x1, x2); // 起始坐标
+        ctx.lineTo(x3, x4); // 结束坐标
+        ctx.stroke();
+      }
+    </script>
+  </body>
+</html>
